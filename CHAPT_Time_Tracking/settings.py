@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'CHAPT_Time_Tracking.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'chapt',
+        'USER': 'externalChapt',
+        'PASSWORD': 'Boon1/3NoobCapNhat',
+        'HOST': '75.40.51.27',
+        'PORT': '3306',
     }
 }
 
