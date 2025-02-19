@@ -1,0 +1,19 @@
+<!-- shift_management/templates/shift_management/add_shift.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Shift</title>
+</head>
+<body>
+
+<h1>Add Shift</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Shift</button>
+</form>
+
+</body>
+</html>
