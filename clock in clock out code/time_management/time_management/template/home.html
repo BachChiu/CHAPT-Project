@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome, {{ user.username }}</h1>
+
+    <h2>Your Time Records</h2>
+    <table>
+        <tr>
+            <th>Clock In</th>
+            <th>Clock Out</th>
+            <th>Overtime</th>
+        </tr>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.clock_in }}</td>
+            <td>{{ record.clock_out }}</td>
+            <td>
+                {% if record.overtime %}
+                    {{ record.overtime }}
+                {% else %}
+                    No overtime
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <a href="{% url 'clock_in' %}">Clock In</a> | <a href="{% url 'clock_out' %}">Clock Out</a>
+</body>
+</html>
