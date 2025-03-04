@@ -80,3 +80,21 @@ CREATE TABLE Break
     PRIMARY KEY(breakID),
     INDEX idx_shift (shiftID)
 )ENGINE = InnoDB;
+CREATE TABLE announcements (
+    announcementID int NOT NULL AUTO_INCREMENT,
+    employerID varchar(100),
+    announcement Text, 
+    announcementTime datetime, 
+    FOREIGN KEY (employerID) REFERENCES account(userID), 
+    PRIMARY KEY(announcementID),
+    Index idx_employer (employerID)
+)ENGINE = InnoDB;
+CREATE TABLE notices
+(
+    employeeID varchar(100),
+    announcementID int NOT NULL,
+    FOREIGN KEY (employeeID) REFERENCES account(userID),
+    FOREIGN KEY (announcementID) REFERENCES announcements(announcementID),
+    CONSTRAINT noticesPK PRIMARY KEY(employeeID, announcementID),
+    Index idx_employee (employeeID)
+)ENGINE = InnoDB;
