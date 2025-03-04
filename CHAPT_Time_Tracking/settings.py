@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     #apps
     'home',
+    'common',
 ]
 
 MIDDLEWARE = [
@@ -84,6 +85,9 @@ DATABASES = {
         'PASSWORD': 'Boon1/3NoobCapNhat',
         'HOST': '75.40.51.27',
         'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
+        }
     }
 }
 
