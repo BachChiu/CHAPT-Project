@@ -1,11 +1,37 @@
-{% extends "home/base.html" %}
-
-{% block title %}Home - CHAPT Time Tracking{% endblock %}
-
-{% block content %}
-<div class="text-center">
-    <h1>Welcome to CHAPT Time Tracking</h1>
-    <p>Track your work hours efficiently with our easy-to-use system.</p>
-    <a href="{% url 'dashboard' %}" class="btn btn-primary">Go to Dashboard</a>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeTracker - Home</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>TimeTracker</h2>
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Clock In/Out</a></li>
+                <li><a href="#">Timesheet</a></li>
+                <li><a href="#">Schedule</a></li>
+                <li><a href="#">Payments</a></li>
+                <li><a href="#">Settings</a></li>
+                <li><a href="#">Profile</a></li>
+                <li><a href="#">Logout</a></li>
+            </ul>
+        </nav>
+        <main class="content">
+            <header>
+                <h1>Welcome to TimeTracker</h1>
+                <p>Your solution for accurate work time tracking and payroll management.</p>
+            </header>
+            <section class="actions">
+                <button onclick="location.href='dashboard.html'">Go to Dashboard</button>
+                <button onclick="location.href='clock.html'">Clock In/Out</button>
+                <button onclick="location.href='schedule.html'">View Schedule</button>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
