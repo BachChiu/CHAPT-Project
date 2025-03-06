@@ -13,11 +13,14 @@ class roleView(TemplateView):
         role = request.POST.get("role")
         if role:
             try:
+                #Check if it exist in database or not, if it is then show user it already existed
                 Roletable.objects.get(userrole=role)
                 return render(request, self.template_name, {"error": "Role already existed"})
             except:
+                #if not exist then creates
                 Roletable.objects.create(userrole=role)
                 return render(request, self.template_name, {"error": "Role is created"})
+        #This is if nothing is inputted
         return render(request, self.template_name, {"error": "Role is required!"})
             
                     
