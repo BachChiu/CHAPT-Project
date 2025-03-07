@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="#" class="p-2 bg-blue-500 text-white rounded-lg">Dashboard</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Employee Management</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock Logs</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Payroll & Invoices</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedules</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Requests & Approvals</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Settings</a>
+                <a href="#" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Welcome & Profile Section -->
+            <div class="bg-white shadow-md rounded-lg p-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-800">Welcome, Employer!</h1>
+                    <p class="text-gray-600 mt-2">Manage employee data and company schedules.</p>
+                </div>
+                <div class="flex items-center">
+                    <img id="profile-pic" src="https://via.placeholder.com/50" alt="Profile Picture" class="w-12 h-12 rounded-full">
+                    <div class="ml-4">
+                        <h2 class="text-lg font-semibold text-gray-800">John Doe</h2>
+                        <p class="text-gray-600">Operations Manager</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Management Section -->
+            <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-gray-800">Employee Management</h2>
+                <table class="w-full mt-4 border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="border p-2">Name</th>
+                            <th class="border p-2">Position</th>
+                            <th class="border p-2">Status</th>
+                            <th class="border p-2">Schedule</th>
+                            <th class="border p-2">Clock In/Out</th>
+                            <th class="border p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employee-table">
+                        <!-- Employee rows will be added dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Requests & Approvals Section -->
+            <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-gray-800">Requests & Approvals</h2>
+                <table class="w-full mt-4 border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="border p-2">Employee</th>
+                            <th class="border p-2">Request Type</th>
+                            <th class="border p-2">Details</th>
+                            <th class="border p-2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requests-table">
+                        <!-- Requests will be added dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Payroll & Invoices -->
+            <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-gray-800">Payroll & Invoices</h2>
+                <a href="#" class="text-blue-500 hover:underline">View Payroll Records</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function generateEmployeeList() {
+            const employees = [
+                { name: "Alice Johnson", position: "Software Engineer", status: "Active", schedule: "9 AM - 5 PM", clock: "Clocked In" },
+                { name: "Bob Smith", position: "Product Manager", status: "On Leave", schedule: "-", clock: "-" },
+                { name: "Charlie Davis", position: "HR Specialist", status: "Active", schedule: "10 AM - 6 PM", clock: "Clocked Out" },
+                { name: "Dana White", position: "Marketing Lead", status: "Inactive", schedule: "-", clock: "-" }
+            ];
+
+            const tableBody = document.getElementById("employee-table");
+            tableBody.innerHTML = "";
+
+            employees.forEach(employee => {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="border p-2">${employee.name}</td>
+                    <td class="border p-2">${employee.position}</td>
+                    <td class="border p-2">${employee.status}</td>
+                    <td class="border p-2">${employee.schedule}</td>
+                    <td class="border p-2">${employee.clock}</td>
+                    <td class="border p-2">
+                        <button class="bg-blue-500 text-white px-2 py-1 rounded">View Schedule</button>
+                        <button class="bg-green-500 text-white px-2 py-1 rounded ml-2">Clock Logs</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function generateRequests() {
+            const requests = [
+                { employee: "Alice Johnson", type: "Time Off", details: "Vacation from June 10-15" },
+                { employee: "Charlie Davis", type: "Shift Swap", details: "Swap June 5 shift with Bob" }
+            ];
+            
+            const requestsTable = document.getElementById("requests-table");
+            requestsTable.innerHTML = "";
+            
+            requests.forEach(request => {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="border p-2">${request.employee}</td>
+                    <td class="border p-2">${request.type}</td>
+                    <td class="border p-2">${request.details}</td>
+                    <td class="border p-2">
+                        <button class="bg-green-500 text-white px-2 py-1 rounded">Approve</button>
+                        <button class="bg-red-500 text-white px-2 py-1 rounded ml-2">Deny</button>
+                    </td>
+                `;
+                requestsTable.appendChild(row);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            generateEmployeeList();
+            generateRequests();
+        });
+    </script>
+</body>
+</html>
