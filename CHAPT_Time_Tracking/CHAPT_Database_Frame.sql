@@ -98,3 +98,8 @@ CREATE TABLE notices
     CONSTRAINT noticesPK PRIMARY KEY(employeeID, announcementID),
     Index idx_employee (employeeID)
 )ENGINE = InnoDB;
+--Dealing with Django lacks of composite key support.
+ALTER TABLE company ADD COLUMN id INT AUTO_INCREMENT UNIQUE;
+ALTER TABLE employed ADD COLUMN id INT AUTO_INCREMENT UNIQUE
+ALTER TABLE notices ADD COLUMN id INT AUTO_INCREMENT UNIQUE;
+ALTER TABLE expenses ADD COLUMN id INT AUTO_INCREMENT UNIQUE;
