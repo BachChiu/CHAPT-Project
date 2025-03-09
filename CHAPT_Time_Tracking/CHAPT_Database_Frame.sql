@@ -3,7 +3,7 @@ CREATE TABLE Account
     userID varchar(100) NOT NULL,
     firstName varchar(100) NOT NULL,
     lastName varchar(100) NOT NULL,
-    userPass varchar(64),
+    userPass varchar(256) NOT NULL,
     PRIMARY KEY (userID),
     INDEX idx_fName (firstName),
     INDEX idx_lName (lastName)

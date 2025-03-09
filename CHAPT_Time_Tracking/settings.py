@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'chapt',
         'USER': 'externalChapt',
         'PASSWORD': 'Boon1/3NoobCapNhat',
-        'HOST': '75.40.51.27',
+        'HOST': 'chapt.duckdns.org',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
