@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'home',
     'common',
     'registration',
+    'authentication',
 ]
 
 MIDDLEWARE = [
@@ -81,11 +82,13 @@ WSGI_APPLICATION = 'CHAPT_Time_Tracking.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        #Change everything between here and the next comment for your own testing locally by creating the database using the frame I provided in your own MySQL, then connect to that
         'NAME': 'chapt',
         'USER': 'externalChapt',
         'PASSWORD': 'Boon1/3NoobCapNhat',
         'HOST': 'chapt.duckdns.org',
         'PORT': '3306',
+        #Stop here, for local test, probably change the host to 127.0.0.1, user and password and name is whatever you set it to be in your own MySQL
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
         }

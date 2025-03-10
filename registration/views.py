@@ -20,7 +20,9 @@ class RegisterView(TemplateView):
                 try:
                     Account.objects.get_or_create(userid=newUserID, firstname=fname, lastname = lname, userpass = newUserPass) #Create a new account, if it is already created then it just does nothing
                     account = Account.objects.get(userid = newUserID) #Grab the specific account that was just created/match the form as it is required for foreign key reference in Django (for the command below)
-                    Employed.objects.get_or_create(employeeid=account, companyid=newCompany, userrole = role, usersalary=0.0) #Create a new employee, if it is already created then does nothing
+                    newCompanyObj = Company.objects.get(companyid=newCompany) #Grab specific company that the employee is to be assigned to
+                    newrole = Roletable.objects.get(userrole=role) #Grab the user role
+                    Employed.objects.get_or_create(employeeid=account, companyid=newCompanyObj, userrole = newrole, usersalary=0.0) #Create a new employee, if it is already created then does nothing
                     return render(request, self.template_name, {"error": "Employee created"})
                 except Exception as e:
                     return render(request, self.template_name, {"error": f"That failed miserably {str(e)}"})
