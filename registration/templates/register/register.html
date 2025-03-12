@@ -1,0 +1,29 @@
+<html>
+    <form action="{% url 'registerView' %}" method='POST'>{% csrf_token %}
+        <label for="userID">userID:</label>
+        <input type="text" id="userID" name="userID"></input>
+        <br>
+        <label for="fname">First Name:</label>
+        <input type="text" id="fname" name="fname"></input>
+        <br>
+        <label for="lname">Last Name:</label>
+        <input type="text" id="lname" name="lname"></input>
+        <br>
+        <label for="userPass">Password:</label>
+        <input type="password" id="userPass" name="userPass"></input>
+        <br>
+        <label for="companyID">CompanyID:</label>
+        <input type="text" id="companyID" name="companyID"></input>
+        <p>Role:</p>
+        <label for="employee">Employee</label>
+        <input type="radio" id="employee" name="role" value="Employee"></input>
+        <br>
+        <label for="employer">Employer</label>
+        <input type="radio" id="employer" name="role" value="Employer"></input>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+</html> 
+{% if error %}
+    <p style="color: red;">{{ error }}</p>
+{% endif %}

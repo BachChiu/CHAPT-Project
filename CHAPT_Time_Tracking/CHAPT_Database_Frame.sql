@@ -3,7 +3,7 @@ CREATE TABLE Account
     userID varchar(100) NOT NULL,
     firstName varchar(100) NOT NULL,
     lastName varchar(100) NOT NULL,
-    userPass varchar(64),
+    userPass varchar(256) NOT NULL,
     PRIMARY KEY (userID),
     INDEX idx_fName (firstName),
     INDEX idx_lName (lastName)
@@ -98,3 +98,8 @@ CREATE TABLE notices
     CONSTRAINT noticesPK PRIMARY KEY(employeeID, announcementID),
     Index idx_employee (employeeID)
 )ENGINE = InnoDB;
+--Dealing with Django lacks of composite key support.
+ALTER TABLE company ADD COLUMN id INT AUTO_INCREMENT UNIQUE;
+ALTER TABLE employed ADD COLUMN id INT AUTO_INCREMENT UNIQUE
+ALTER TABLE notices ADD COLUMN id INT AUTO_INCREMENT UNIQUE;
+ALTER TABLE expenses ADD COLUMN id INT AUTO_INCREMENT UNIQUE;
