@@ -88,11 +88,12 @@ DATABASES = {
         'PASSWORD': 'Boon1/3NoobCapNhat',
         'HOST': 'chapt.duckdns.org',
         'PORT': '3306',
+        'TEST':{'NAME': 'test_chapt'},
         #Stop here, for local test, probably change the host to 127.0.0.1, user and password and name is whatever you set it to be in your own MySQL
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
         }
-    }
+    },
 }
 
 
