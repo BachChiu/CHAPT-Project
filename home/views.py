@@ -23,4 +23,4 @@ class roleView(TemplateView):
         #This is if nothing is inputted
         return render(request, self.template_name, {"error": "Role is required!"})
             
-                    
+                   
