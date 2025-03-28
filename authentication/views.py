@@ -13,7 +13,7 @@ class LoginView(TemplateView):
         try:
             user = Account.objects.get(userid = loginID) #Find the account
         except Exception as e:
-            return render(request, self.template_name, {"error": f"Account doesn't exist:{str(e)}"})
+            return render(request, self.template_name, {"error": f"Account does not exist:"})
         userPass = user.userpass #Technically I could just throw it straight in check_password but anyway
         validPass = check_password(loginPass, userPass) #compare password
         if validPass:
