@@ -27,7 +27,10 @@
             <p class="error-message" style="text-align: center; margin-top: 15px;">{{ success }}</p>
         </div>
         {% endif %}
-
+        <div style= "margin-bottom: 15px;">
+            <a href="{% url 'loginView' %}">Login</a><br>
+            <a href="{% url 'homeView' %}">Back to home</a>
+        </div>
         <form action="{% url 'registerView' %}" method="POST">
             {% csrf_token %}
             

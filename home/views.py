@@ -21,6 +21,6 @@ class roleView(TemplateView):
                 Roletable.objects.create(userrole=role)
                 return render(request, self.template_name, {"error": "Role is created"})
         #This is if nothing is inputted
-        return render(request, self.template_name, {"error": "Role is required!"})
+        return render(request, self.template_name, {"error": f"Role is required!"})
             
                     
