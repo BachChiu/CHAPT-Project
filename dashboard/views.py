@@ -18,4 +18,4 @@ class dashboardView(TemplateView):
 def logoutView (request):
     request.session.flush()
     return render(request, 'home/home.html', {"error": "Logout successfully"})
-        
+
