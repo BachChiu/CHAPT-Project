@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="#" class="p-2 bg-blue-500 text-white rounded-lg">Dashboard</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock In/Out</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Timesheet</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedule</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Payments</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Settings</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Profile</a>
+                <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Welcome & Profile Section -->
+            <div class="bg-white shadow-md rounded-lg p-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-800">Welcome, Employee!</h1>
+                    <p class="text-gray-600 mt-2">Here’s your current schedule and details.</p>
+                </div>
+                <div class="flex items-center">
+                    <img src="https://via.placeholder.com/50" alt="Profile Picture" class="w-12 h-12 rounded-full">
+                    <div class="ml-4">
+                        <h2 class="text-lg font-semibold text-gray-800">John Doe</h2>
+                        <p class="text-gray-600">Software Engineer | IT Department</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clock Display & Clock In/Out Section -->
+            <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-gray-800">Current Time</h2>
+                    <p id="clock" class="text-lg font-semibold text-blue-600"></p>
+                </div>
+                <div class="mt-4 flex space-x-2">
+                    <button class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Clock In</button>
+                    <button class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">Take Break</button>
+                    <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Clock Out</button>
+                </div>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-gray-800">Earnings Overview</h2>
+                <p class="text-gray-600">Total Hours Worked: <strong>80 hrs</strong></p>
+                <p class="text-gray-600">Estimated Earnings: <strong>$1,200</strong></p>
+                <a href="#" class="text-blue-500 hover:underline">View Payment History</a>
+            </div>
+
+            <!-- Next Shift Reminder -->
+            <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+                <h2 class="text-xl font-semibold text-gray-800">Next Shift</h2>
+                <p class="text-gray-600">Monday, March 4th</p>
+                <p class="text-gray-600">Start Time: <strong>9:00 AM</strong></p>
+                <p class="text-gray-600">End Time: <strong>5:00 PM</strong></p>
+            </div>
+
+            <!-- Weekly Schedule Section with Month, Dates, and Shifts -->
+            <div class="mt-6">
+                <div class="bg-white shadow-md rounded-lg p-4">
+                    <h2 id="month-title" class="text-xl font-semibold text-gray-800"></h2>
+                    <div class="grid grid-cols-6 gap-1 mt-4 text-center">
+                        <div class="font-semibold">Time</div>
+                        <div id="monday" class="font-semibold">Monday</div>
+                        <div id="tuesday" class="font-semibold">Tuesday</div>
+                        <div id="wednesday" class="font-semibold">Wednesday</div>
+                        <div id="thursday" class="font-semibold">Thursday</div>
+                        <div id="friday" class="font-semibold">Friday</div>
+                    </div>
+                    <div id="schedule-grid" class="grid grid-cols-6 gap-1 text-center"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function updateClock() {
+            const clockElement = document.getElementById("clock");
+            if (clockElement) {
+                setInterval(() => {
+                    const now = new Date();
+                    clockElement.textContent = now.toLocaleTimeString();
+                }, 1000);
+            }
+        }
+        updateClock();
+
+        function generateWeeklySchedule() {
+            const scheduleGrid = document.getElementById("schedule-grid");
+            scheduleGrid.innerHTML = "";
+            const now = new Date();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById("month-title").textContent = monthNames[now.getMonth()] + " " + now.getFullYear();
+            
+            const shifts = {
+                "Monday": [[9, 11]],
+                "Wednesday": [[11, 14]],
+                "Friday": [[14, 17]]
+            };
+            
+            const times = ["8:00 AM", "9:00 AM", "10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"];
+            const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+            
+            times.forEach((time, index) => {
+                let row = [document.createElement("div")];
+                row[0].classList.add("p-2", "border", "bg-gray-200");
+                row[0].textContent = time;
+                
+                days.forEach(day => {
+                    let shiftCell = document.createElement("div");
+                    shiftCell.classList.add("p-2", "border", "bg-gray-300");
+                    if (shifts[day]?.some(shift => index >= shift[0] - 8 && index < shift[1] - 8)) {
+                        shiftCell.classList.add("bg-gray-400");
+                        shiftCell.textContent = "Shift";
+                    }
+                    row.push(shiftCell);
+                });
+                row.forEach(cell => scheduleGrid.appendChild(cell));
+            });
+        }
+        generateWeeklySchedule();
+    </script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+<!-- Site for testing database only, to be deleted later-->
+<html>
+    <form action="{% url 'roleView' %}" method='POST'>{% csrf_token %}
+        <label for="role">Role:</label>
+        <input type="text" id="role" name="role"></input>
+        <button type="submit">Submit</button>
+    </form>
+</html> 
+{% if error %}
+    <p style="color: red;">{{ error }}</p>
+{% endif %}
