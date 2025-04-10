@@ -125,6 +125,13 @@
                             </td>
                             <td class="px-6 py-4">
                                 <button type="submit" name="update_schedule" value="{{ schedule.scheduleid }}" class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">Update</button>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="delete_schedule" value="{{ schedule.scheduleid }}">
+                                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                        Delete
+                                    </button>
+                                </form>
                             </td>
                         </form>
                     </tr>

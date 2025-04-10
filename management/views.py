@@ -100,7 +100,14 @@ class ManageScheduleView(TemplateView):
         company = Company.objects.get(employerid=current_user)
         employees = Employed.objects.filter(companyid=company).select_related('employeeid')
         schedules = Schedules.objects.filter(employeeid__in=[e.employeeid for e in employees]).select_related('employeeid')
-
+        #Deleting schedule
+        if 'delete_schedule' in request.POST:
+            schedule_id = request.POST.get('delete_schedule')
+            try:
+                schedule = Schedules.objects.get(scheduleid=schedule_id)
+                schedule.delete()
+            except Schedules.DoesNotExist:
+                pass
         # Handle adding a new schedule
         if 'add_schedule' in request.POST:
             employee_id = request.POST.get('employee_id')
