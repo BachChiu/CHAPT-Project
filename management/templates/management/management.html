@@ -50,7 +50,7 @@
                                             type="number"
                                             step="0.01"
                                             name="salary_{{ emp.employeeid.userid }}"
-                                            value="{{ emp.usersalary }}"
+                                            value="{{ emp.usersalary|floatformat:2}}"
                                             required
                                             class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
                                         >

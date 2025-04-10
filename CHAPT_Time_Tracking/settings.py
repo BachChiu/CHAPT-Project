@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'registration',
     'authentication',
     'dashboard',
-    'management'
+    'management',
+    'employee'
 ]
 
 MIDDLEWARE = [

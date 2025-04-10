@@ -74,14 +74,18 @@ class ManageScheduleView(TemplateView):
             end_date_filter = ''
         # Filter schedules based on the filters provided
         schedules = Schedules.objects.filter(employeeid__in=[e.employeeid for e in employees])
-
-        if employee_filter:
+        if 'scheduleFilter_employee' in request.session:
+            employee_filter = request.session.get('scheduleFilter_employee')
             schedules = schedules.filter(employeeid=employee_filter)
-        if start_date_filter:
+            del request.session['scheduleFilter_employee'] #Just to clean it up and not have it get persisted through different filters.
+        elif employee_filter != '' and employee_filter:
+            schedules = schedules.filter(employeeid=employee_filter)
+        if start_date_filter != '' and start_date_filter:
             schedules = schedules.filter(endtime__gte=make_aware(parse_datetime(start_date_filter)))
-        if end_date_filter:
+        if end_date_filter != '' and end_date_filter:
             schedules = schedules.filter(endtime__lte=make_aware(parse_datetime(end_date_filter)))
         
+            
         schedules = schedules.order_by('starttime', 'employeeid')
 
         return render(request, self.template_name, {

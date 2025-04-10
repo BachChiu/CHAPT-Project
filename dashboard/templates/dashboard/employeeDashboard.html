@@ -28,14 +28,14 @@
             <!-- Welcome & Profile Section -->
             <div class="bg-white shadow-md rounded-lg p-6 flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-semibold text-gray-800">Welcome, Employee!</h1>
-                    <p class="text-gray-600 mt-2">Here’s your current schedule and details.</p>
+                    <h1 class="text-2xl font-semibold text-gray-800">Welcome, {{ current_user.firstname }} {{ current_user.lastname }}!</h1>
+                    <p class="text-gray-600 mt-2">Here's your current schedules and detail</p>
                 </div>
                 <div class="flex items-center">
                     <img src="https://via.placeholder.com/50" alt="Profile Picture" class="w-12 h-12 rounded-full">
                     <div class="ml-4">
-                        <h2 class="text-lg font-semibold text-gray-800">John Doe</h2>
-                        <p class="text-gray-600">Software Engineer | IT Department</p>
+                        <h2 class="text-lg font-semibold text-gray-800">{{ current_user.firstname }} {{ current_user.lastname }}</h2>
+                        <p class="text-gray-600">Employee</p>
                     </div>
                 </div>
             </div>
