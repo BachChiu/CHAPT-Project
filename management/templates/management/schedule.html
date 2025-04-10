@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Employee Schedules</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+        <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+        <nav class="flex flex-col space-y-2">
+            <a href="{% url 'dashboardView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Dashboard</a>
+            <a href="{% url 'managementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Employee Management</a>
+            <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock Logs</a>
+            <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Payroll & Invoices</a>
+            <a href="{% url 'manageScheduleView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Schedules</a>
+            <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Requests & Approvals</a>
+            <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Settings</a>
+            <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Profile</a>
+            <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-10 overflow-y-auto">
+        <h2 class="text-2xl font-bold mb-6 text-gray-800">Manage Employee Schedules</h2>
+    
+        <!-- Filter Form -->
+        <form method="GET" class="space-y-4 mb-6 bg-white p-6 rounded-lg shadow-md">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Employee Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Employee</label>
+                    <select name="employee" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        <option value="">All Employees</option>
+                        {% for emp in employees %}
+                            <option value="{{ emp.employeeid.userid }}" {% if employee_filter == emp.employeeid.userid|stringformat:"s" %} selected {% endif %}>
+                                {{ emp.employeeid.firstname }} {{ emp.employeeid.lastname }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Start Date Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                    <input type="datetime-local" name="start_date" value="{{ start_date_filter }}" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                </div>
+
+                <!-- End Date Filter -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">End Date</label>
+                    <input type="datetime-local" name="end_date" value="{{ end_date_filter }}" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                </div>
+            </div>
+            <button type="submit" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Apply Filters</button>
+            <!-- Reset Filter Button -->
+            <button type="submit" name="reset_filter" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Reset Filters</button>
+        </form>
+    
+        <!-- Add New Schedule Toggle Button -->
+        <button 
+            type="button" 
+            onclick="document.getElementById('add-schedule-form').classList.toggle('hidden')"
+            class="mb-6 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+        >
+            Add Shift
+        </button>
+
+        {% if error %}
+            <div class="text-red-600 mb-4">{{ error }}</div>
+        {% endif %}
+
+        <!-- Add New Schedule Form (Hidden by default) -->
+        <form id="add-schedule-form" method="POST" class="space-y-4 bg-white p-6 rounded-lg shadow-md hidden">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Employee</label>
+                    <select name="employee_id" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                        {% for emp in employees %}
+                            <option value="{{ emp.employeeid.userid }}">{{ emp.employeeid.firstname }} {{ emp.employeeid.lastname }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Start Time</label>
+                    <input type="datetime-local" name="start_time" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">End Time</label>
+                    <input type="datetime-local" name="end_time" required class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                </div>
+            </div>
+            <button type="submit" name="add_schedule" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add Shift</button>
+        </form>
+    
+        <!-- Schedule Table -->
+        <div class="overflow-x-auto mt-8">
+            <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                <thead class="bg-gray-200 text-gray-700 text-left">
+                    <tr>
+                        <th class="px-6 py-3">Employee</th>
+                        <th class="px-6 py-3">Start Time</th>
+                        <th class="px-6 py-3">End Time</th>
+                        <th class="px-6 py-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                    <tr class="border-b">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                {{ schedule.employeeid.firstname }} {{ schedule.employeeid.lastname }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <input type="datetime-local" name="start_time" value="{{ schedule.starttime|date:'Y-m-d\\TH:i' }}" class="border border-gray-300 rounded-lg px-3 py-2">
+                            </td>
+                            <td class="px-6 py-4">
+                                <input type="datetime-local" name="end_time" value="{{ schedule.endtime|date:'Y-m-d\\TH:i' }}" class="border border-gray-300 rounded-lg px-3 py-2">
+                            </td>
+                            <td class="px-6 py-4">
+                                <button type="submit" name="update_schedule" value="{{ schedule.scheduleid }}" class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">Update</button>
+                            </td>
+                        </form>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>

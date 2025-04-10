@@ -1,46 +1,8 @@
-import datetime
-from pyexpat.errors import messages
-from django.shortcuts import render, redirect
-from django.views.generic import TemplateView
-from common.models import Account, Employed, Company, Schedules, Shifttime
-from django.utils import timezone
-from django.utils.timezone import make_aware
-from django.utils.dateparse import parse_datetime
-
-class ManagementView(TemplateView):
-    template_name = 'management/management.html'
-
-    def get(self, request):
-        if 'currentUser' not in request.session:
-            return render(request, 'login/login.html', {"error": "Please login to access this page"})
-
-        userRole = request.session.get('role')
-        if userRole != 'Employer':
-            return render(request, 'login/login.html', {"error": "Invalid role"})
-
-        currentUser = Account.objects.get(userid=request.session['currentUser']) #Get the account associated with the current user
-        company = Company.objects.get(employerid=currentUser)#get the company that the employer is running
-        employees = Employed.objects.filter(companyid=company).select_related('employeeid')#Get all employees in the company/under current user's jurisdiction
-
-        return render(request, self.template_name, {'employees': employees})
-
-    def post(self, request):
-        if 'currentUser' not in request.session or request.session.get('role') != 'Employer':
-            return render(request, 'login/login.html', {"error": "Unauthorized access"})
-
-        for key, value in request.POST.items():
-            if key.startswith('salary_'):
-                employee_id = key.replace('salary_', '')
-                try:
-                    employed = Employed.objects.get(employeeid=employee_id)
-                    employed.usersalary = value
-                    employed.save()
-                except Employed.DoesNotExist:
-                    continue  # skip if someone tampers with the form
-
-        return redirect('managementView') #then just reload the page
-    
-
+'''
+ This is here so i can deal with some extra stuff regarding keeping the filter after updating and stuff later, the point is this code was suppose to
+ allow update and adding shift, whilst keeping the filter on the page the same (or update the filter at the same time as updating/adding shift). However,
+ despite keeping the filter consistent, it fails to update the filter unless I click apply filter, but I want it to apply along with whatever changes I make instead,
+ so for now this code is left here so I can revisit when I have time.
 class ManageScheduleView(TemplateView):
     template_name = 'management/schedule.html'
 
@@ -51,11 +13,21 @@ class ManageScheduleView(TemplateView):
         current_user = Account.objects.get(userid=request.session['currentUser'])
         company = Company.objects.get(employerid=current_user)
         employees = Employed.objects.filter(companyid=company).select_related('employeeid')
-
-        # Get filter values
         employee_filter = request.GET.get('employee', '')
         start_date_filter = request.GET.get('start_date', '')
         end_date_filter = request.GET.get('end_date', '')
+        if employee_filter == '' and 'scheduleFilter_employee' in request.session:
+            employee_filter = request.session['scheduleFilter_employee'] 
+        else:
+            request.session['scheduleFilter_employee'] = employee_filter
+        if start_date_filter == '' and 'scheduleFilter_start' in request.session:
+            start_date_filter = request.session['scheduleFilter_start']
+        else:
+            request.session['scheduleFilter_start'] = start_date_filter
+        if end_date_filter == '' and 'scheduleFilter_end' in request.session:
+            end_date_filter = request.session['scheduleFilter_end']
+        else:
+            request.session['scheduleFilter_end'] = end_date_filter
         if 'reset_filter' in request.GET:
             try:
                 del request.session['scheduleFilter_employee']
@@ -72,6 +44,9 @@ class ManageScheduleView(TemplateView):
             employee_filter = ''
             start_date_filter = ''
             end_date_filter = ''
+        
+        
+        
         # Filter schedules based on the filters provided
         schedules = Schedules.objects.filter(employeeid__in=[e.employeeid for e in employees])
 
@@ -100,7 +75,21 @@ class ManageScheduleView(TemplateView):
         company = Company.objects.get(employerid=current_user)
         employees = Employed.objects.filter(companyid=company).select_related('employeeid')
         schedules = Schedules.objects.filter(employeeid__in=[e.employeeid for e in employees]).select_related('employeeid')
-
+        employee_filter = request.GET.get('employee', '')
+        start_date_filter = request.GET.get('start_date', '')
+        end_date_filter = request.GET.get('end_date', '')
+        if employee_filter == '' and 'scheduleFilter_employee' in request.session:
+            employee_filter = request.session['scheduleFilter_employee'] 
+        else:
+            request.session['scheduleFilter_employee'] = employee_filter
+        if start_date_filter == '' and 'scheduleFilter_start' in request.session:
+            start_date_filter = request.session['scheduleFilter_start']
+        else:
+            request.session['scheduleFilter_start'] = start_date_filter
+        if end_date_filter == '' and 'scheduleFilter_end' in request.session:
+            end_date_filter = request.session['scheduleFilter_end']
+        else:
+            request.session['scheduleFilter_end'] = end_date_filter
         # Handle adding a new schedule
         if 'add_schedule' in request.POST:
             employee_id = request.POST.get('employee_id')
@@ -116,6 +105,9 @@ class ManageScheduleView(TemplateView):
                         "error": "Start time must be before end time.",
                         'employees': employees,
                         'schedules': schedules,
+                        'employee_filter': employee_filter, 
+                        'start_date_filter': start_date_filter,
+                        'end_date_filter': end_date_filter,
                     })
 
                 overlapping_shifts = Schedules.objects.filter(employeeid=employee_id)
@@ -125,6 +117,9 @@ class ManageScheduleView(TemplateView):
                             "error": "The new shift overlaps with an existing shift.",
                             "employees": employees,
                             "schedules": schedules,
+                            'employee_filter': employee_filter, 
+                            'start_date_filter': start_date_filter,
+                            'end_date_filter': end_date_filter,
                         })
 
                 Schedules.objects.create(
@@ -154,6 +149,9 @@ class ManageScheduleView(TemplateView):
                             "error": "Start time must be before end time.",
                             'employees': employees,
                             'schedules': schedules,
+                            'employee_filter': employee_filter, 
+                            'start_date_filter': start_date_filter,
+                            'end_date_filter': end_date_filter,
                         })
 
                     overlapping_shifts = Schedules.objects.filter(employeeid=schedule.employeeid).exclude(scheduleid=schedule_id)
@@ -162,7 +160,10 @@ class ManageScheduleView(TemplateView):
                             return render(request, self.template_name, {
                                 "error": "The new shift overlaps with an existing shift.",
                                 "employees": employees,
-                                "schedules": schedules
+                                "schedules": schedules,
+                                'employee_filter': employee_filter, 
+                                'start_date_filter': start_date_filter,
+                                'end_date_filter': end_date_filter,
                             })
 
                     schedule.starttime = start_time
@@ -173,3 +174,6 @@ class ManageScheduleView(TemplateView):
                     continue
 
         return redirect('manageScheduleView')
+        
+       
+        '''
