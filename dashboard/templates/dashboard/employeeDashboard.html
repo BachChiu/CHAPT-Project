@@ -1,3 +1,4 @@
+{% load custom_filters %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +42,7 @@
             </div>
 
             <!-- Clock Display & Clock In/Out Section -->
-            <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+            <!--div class="mt-6 bg-white shadow-md rounded-lg p-4">
                 <div class="flex items-center justify-between">
                     <h2 class="text-xl font-semibold text-gray-800">Current Time</h2>
                     <p id="clock" class="text-lg font-semibold text-blue-600"></p>
@@ -51,7 +52,124 @@
                     <button class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">Take Break</button>
                     <button class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Clock Out</button>
                 </div>
+            </div-->
+
+<!-- Clock Display & Clock In/Out Section -->
+<div class="mt-6 bg-white shadow-md rounded-lg p-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-xl font-semibold text-gray-800">Current Time</h2>
+            <p class="text-gray-600">{{ current_time|date:"l, F j, Y" }}</p>
+        </div>
+        <p class="text-lg font-semibold text-blue-600">{{ current_time|time:"H:i:s" }}</p>
+    </div>
+    
+    <div class="mt-4 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+            <span class="text-sm font-medium">Status:</span>
+            {% if clock_status == 'out' %}
+                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100">Clocked Out</span>
+            {% elif clock_status == 'in' %}
+                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Clocked In</span>
+            {% elif clock_status == 'break' %}
+                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">On Break</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if clock_status != 'out' %}
+    <div class="mt-4 grid grid-cols-3 gap-4">
+        <div>
+            <span class="text-sm">Shift Started:</span>
+            <span class="text-sm font-medium">{{ shift_start }}</span>
+        </div>
+        <div>
+            <span class="text-sm">Elapsed Time:</span>
+            <span class="text-sm font-medium">{{ elapsed_time|default:"00:00:00" }}</span>
+        </div>
+        <div>
+            <span class="text-sm">Break Duration:</span>
+            <span class="text-sm font-medium">{{ break_duration|default:"00:00:00" }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="mt-4 flex space-x-2">
+        <form method="post" action="{% url 'clock_in' %}" class="flex-1">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600" {% if clock_status != 'out' %}disabled{% endif %}>
+                Clock In
+            </button>
+        </form>
+        
+        {% if clock_status == 'in' %}
+        <form method="post" action="{% url 'start_break' %}" class="flex-1">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">
+                Take Break
+            </button>
+        </form>
+        {% elif clock_status == 'break' %}
+        <form method="post" action="{% url 'end_break' %}" class="flex-1">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                End Break
+            </button>
+        </form>
+        {% else %}
+        <button type="button" class="flex-1 bg-yellow-500 text-white px-4 py-2 rounded-lg opacity-50 cursor-not-allowed" disabled>
+            Take Break
+        </button>
+        {% endif %}
+        
+        <form method="post" action="{% url 'clock_out' %}" class="flex-1">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600" {% if clock_status == 'out' %}disabled{% endif %}>
+                Clock Out
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Today's Activity -->
+<div class="mt-6 bg-white shadow-md rounded-lg p-4">
+    <h2 class="text-xl font-semibold text-gray-800">Today's Activity</h2>
+    <p class="text-gray-600">Your clock in/out and break records for today</p>
+    
+    <div class="mt-4">
+        {% if today_activity %}
+            <div class="space-y-2">
+                {% for activity in today_activity %}
+                <div class="flex items-center justify-between border-b pb-2">
+                    <div class="flex items-center space-x-2">
+                        {% if activity.action == 'Clock In' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        {% elif activity.action == 'Start Break' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        {% elif activity.action == 'End Break' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                            </svg>
+                        {% elif activity.action == 'Clock Out' %}
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd" />
+                            </svg>
+                        {% endif %}
+                        <span class="text-sm font-medium">{{ activity.action }}</span>
+                    </div>
+                    <span class="text-sm text-gray-500">{{ activity.timestamp|time:"H:i:s" }}</span>
+                </div>
+                {% endfor %}
             </div>
+        {% else %}
+            <p class="text-sm text-gray-500">No activity recorded today.</p>
+        {% endif %}
+    </div>
+</div>
 
             <!-- Payment Summary -->
             <div class="mt-6 bg-white shadow-md rounded-lg p-4">
@@ -60,6 +178,65 @@
                 <p class="text-gray-600">Estimated Earnings: <strong>$1,200</strong></p>
                 <a href="#" class="text-blue-500 hover:underline">View Payment History</a>
             </div>
+
+            <!-- Timesheet Section -->
+<div class="mt-6 bg-white shadow-md rounded-lg p-4">
+    <h2 class="text-xl font-semibold text-gray-800">Timesheet</h2>
+    <p class="text-gray-600">View and manage your work hours</p>
+    
+    <div class="mt-4 overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border-b text-left">Date</th>
+                    <th class="py-2 px-4 border-b text-left">Clock In</th>
+                    <th class="py-2 px-4 border-b text-left">Clock Out</th>
+                    <th class="py-2 px-4 border-b text-left">Breaks</th>
+                    <th class="py-2 px-4 border-b text-left">Total Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if timesheet_data %}
+                    {% for entry in timesheet_data %}
+                    <tr>
+                        <td class="py-2 px-4 border-b">{{ entry.date|date:"D, M d, Y" }}</td>
+                        <td class="py-2 px-4 border-b">{{ entry.clockIn|time:"h:i A" }}</td>
+                        <td class="py-2 px-4 border-b">{{ entry.clockOut|time:"h:i A" }}</td>
+                        <td class="py-2 px-4 border-b">
+                            <div class="space-y-1">
+                                {% if entry.breaks %}
+                                    {% for break in entry.breaks %}
+                                    <div class="text-xs">
+                                        {{ break.start|time:"h:i A" }} - {{ break.end|time:"h:i A" }}
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-xs">No breaks</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="py-2 px-4 border-b">{{ entry.totalHours }} hrs</td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="py-4 px-4 text-center text-gray-500">No timesheet entries found.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="mt-4 flex justify-between">
+        <div>
+            <p class="text-sm text-gray-500">Showing {{ timesheet_data|length }} entries</p>
+        </div>
+        <div>
+            <p class="text-sm">Total Hours This Week: <strong>{{ hours_this_week }} hrs</strong></p>
+            <p class="text-sm">Estimated Earnings: <strong>${{ hours_this_week|floatformat:2|multiply:15 }}</strong></p>
+        </div>
+    </div>
+</div>
 
             <!-- Next Shift Reminder -->
             <div class="mt-6 bg-white shadow-md rounded-lg p-4">
@@ -135,4 +312,4 @@
         generateWeeklySchedule();
     </script>
 </body>
-</html>
+</html-->
