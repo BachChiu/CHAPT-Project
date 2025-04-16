@@ -73,11 +73,6 @@ class PersonalTimesheetView(TemplateView):
 
         shifts = shifts.order_by('-clockin')
 
-        # Convert clockin and clockout to local time
-        for shift in shifts:
-            shift.clockin = timezone.localtime(shift.clockin)
-            shift.clockout = timezone.localtime(shift.clockout)
-
         return render(request, self.template_name, {
             'currentUser': currentUser,
             'start_date_filter': start_date_filter,
