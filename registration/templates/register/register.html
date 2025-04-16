@@ -1,86 +1,260 @@
-<html>
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <style>
-        .success-message {
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #d4edda;
-            color: #155724;
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        /* Container styles */
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 0.875rem;
+        }
+        
+        /* Card styles */
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-size: 0.875rem;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+        }
+        
+        .help-text {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.75rem;
+            color: #718096;
+        }
+        
+        /* Radio button styles */
+        .radio-group {
+            margin-bottom: 1.25rem;
+        }
+        
+        .radio-group-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #4a5568;
+            font-size: 0.875rem;
+        }
+        
+        .radio-option {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1.5rem;
+        }
+        
+        .radio-option input[type="radio"] {
+            margin-right: 0.375rem;
+        }
+        
+        /* Button styles */
+        button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+        }
+        
+        button:hover {
+            background-color: #3182ce;
+        }
+        
+        /* Links styles */
+        .links {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+        
+        a {
+            color: #4299e1;
+            text-decoration: none;
+            transition: color 0.15s ease-in-out;
+        }
+        
+        a:hover {
+            color: #3182ce;
+            text-decoration: underline;
+        }
+        
+        /* Message styles */
+        .success-message {
+            margin-bottom: 1.25rem;
+            padding: 0.75rem;
+            background-color: #f0fff4;
+            color: #22543d;
+            border-radius: 0.375rem;
+            border-left: 4px solid #48bb78;
+            font-size: 0.875rem;
+        }
+        
         .error-message {
-            padding: 10px;
-            border-radius: 4px;
-            background-color: #f8d7da;
-            color: #721c24;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: #fff5f5;
+            color: #e53e3e;
+            border-radius: 0.375rem;
+            border-left: 4px solid #e53e3e;
+            font-size: 0.875rem;
         }
     </style>
 </head>
-<body style="background-color: #210f60; font-family: Arial, sans-serif; padding: 20px; margin: 0;">
-    <div style="width: 100%; max-width: 500px; margin: auto; padding: 20px; background-color: #80b9eb; border-radius: 8px;">
-        <h2 style="text-align: center;">Registration Form</h2>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Create an Account</h1>
+            <p>Fill in your details to get started</p>
+        </div>
         
-        {% if success %}
-        <div style="margin-bottom: 20px;">
-            <p class="error-message" style="text-align: center; margin-top: 15px;">{{ success }}</p>
-        </div>
-        {% endif %}
-        <div style= "margin-bottom: 15px;">
-            <a href="{% url 'loginView' %}">Login</a><br>
-            <a href="{% url 'homeView' %}">Back to home</a>
-        </div>
-        <form action="{% url 'registerView' %}" method="POST">
-            {% csrf_token %}
+        <div class="card">
+            {% if success %}
+            <div class="success-message">
+                {{ success }}
+            </div>
+            {% endif %}
             
-            <div style="margin-bottom: 15px;">
-                <label for="userID" style="font-weight: bold;">User ID:</label><br>
-                <input type="text" id="userID" name="userID" style="width: 100%; padding: 10px; border-radius: 4px;" required>
+            <div class="links">
+                <a href="{% url 'loginView' %}">Already have an account? Sign in</a>
+                <a href="{% url 'homeView' %}">Back to home</a>
             </div>
-
-            <div style="margin-bottom: 15px;">
-                <label for="fname" style="font-weight: bold;">First Name:</label><br>
-                <input type="text" id="fname" name="fname" style="width: 100%; padding: 10px; border-radius: 4px;" required>
+            
+            <form action="{% url 'registerView' %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="userID">User ID</label>
+                    <input type="text" id="userID" name="userID" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fname">First Name</label>
+                    <input type="text" id="fname" name="fname" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lname">Last Name</label>
+                    <input type="text" id="lname" name="lname" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userPass">Password</label>
+                    <input type="password" id="userPass" name="userPass" required>
+                    <span class="help-text">Password must be at least 8 characters long</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userPass2">Confirm Password</label>
+                    <input type="password" id="userPass2" name="userPass2" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="companyID">Company ID</label>
+                    <input type="text" id="companyID" name="companyID" required>
+                </div>
+                
+                <div class="radio-group">
+                    <span class="radio-group-label">Role</span>
+                    <div>
+                        <label class="radio-option">
+                            <input type="radio" id="employee" name="role" value="Employee" required>
+                            Employee
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" id="employer" name="role" value="Employer" required>
+                            Employer
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit">Create Account</button>
+            </form>
+            
+            {% if error %}
+            <div class="error-message">
+                {{ error }}
             </div>
-
-            <div style="margin-bottom: 15px;">
-                <label for="lname" style="font-weight: bold;">Last Name:</label><br>
-                <input type="text" id="lname" name="lname" style="width: 100%; padding: 10px; border-radius: 4px;" required>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label for="userPass" style="font-weight: bold;">Password:</label><br>
-                <input type="password" id="userPass" name="userPass" style="width: 100%; padding: 10px; border-radius: 4px;" required>
-                <small style="color: #666;">Password must be at least 8 characters long</small>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label for="userPass2" style="font-weight: bold;">Confirm Password:</label><br>
-                <input type="password" id="userPass2" name="userPass2" style="width: 100%; padding: 10px; border-radius: 4px;" required>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <label for="companyID" style="font-weight: bold;">Company ID:</label><br>
-                <input type="text" id="companyID" name="companyID" style="width: 100%; padding: 10px; border-radius: 4px;" required>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <p style="font-weight: bold;">Role:</p>
-                <label for="employee" style="margin-right: 10px;">Employee</label>
-                <input type="radio" id="employee" name="role" value="Employee" required>
-                <label for="employer" style="margin-right: 10px;">Employer</label>
-                <input type="radio" id="employer" name="role" value="Employer" required>
-            </div>
-
-            <div style="text-align: center;">
-                <button type="submit" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px;">Submit</button>
-            </div>
-        </form>
-
-        {% if error %}
-            <p class="error-message" style="text-align: center; margin-top: 15px;">{{ error }}</p>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>

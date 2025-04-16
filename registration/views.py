@@ -71,6 +71,7 @@ class RegisterView(TemplateView):
                     )
                     return render(request, self.template_name, {"success": "Employee created"})
                 except Exception as e:
+                    account.delete()
                     return render(request, self.template_name, {"error": f"Registration failed: {str(e)}"})
 
             elif role == "Employer":
@@ -90,6 +91,7 @@ class RegisterView(TemplateView):
 
                     return render(request, self.template_name, {"success": "Employer created"})
                 except Exception as e:
+                    account.delete() #Added so that the account don't get created even when company is invalid
                     return render(request, self.template_name, {"error": f"Registration failed: {str(e)}"})
 
             else:
