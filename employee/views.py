@@ -40,4 +40,47 @@ class PersonalScheduleView(TemplateView):
              'end_date_filter':end_date_filter,  
              'schedules': schedules,                
         })
-    
+
+class PersonalTimesheetView(TemplateView):
+    template_name = 'employee/personalTimesheet.html'
+
+    def get(self, request):
+        if 'currentUser' not in request.session or request.session.get('role') != 'Employee':
+            return render(request, 'login/login.html', {"error": "Unauthorized access"})
+
+        currentUser = Account.objects.get(userid=request.session['currentUser'])
+        start_date_filter = request.GET.get('start_date', '')
+        end_date_filter = request.GET.get('end_date', '')
+
+        if 'reset_filter' in request.GET:
+            try:
+                del request.session['timesheetFilter_start']
+            except:
+                pass
+            try:
+                del request.session['timesheetFilter_end']
+            except:
+                pass
+            start_date_filter = ''
+            end_date_filter = ''
+
+        shifts = Shifttime.objects.filter(employeeid=currentUser)
+
+        if start_date_filter != '' and start_date_filter:
+            shifts = shifts.filter(clockin__gte=make_aware(parse_datetime(start_date_filter)))
+        if end_date_filter != '' and end_date_filter:
+            shifts = shifts.filter(clockout__lte=make_aware(parse_datetime(end_date_filter)))
+
+        shifts = shifts.order_by('-clockin')
+
+        # Convert clockin and clockout to local time
+        for shift in shifts:
+            shift.clockin = timezone.localtime(shift.clockin)
+            shift.clockout = timezone.localtime(shift.clockout)
+
+        return render(request, self.template_name, {
+            'currentUser': currentUser,
+            'start_date_filter': start_date_filter,
+            'end_date_filter': end_date_filter,
+            'shifts': shifts
+        })

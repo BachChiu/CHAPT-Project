@@ -100,6 +100,13 @@ def clock_action(request):
         if not current_shift:
             messages.error(request, "You're not clocked in.")
         else:
+            try:
+                active_break = Break.objects.filter(shiftid=current_shift, breakend__isnull=True).first()
+                if active_break:
+                    active_break.breakend = timezone.now()
+                    active_break.save()
+            except:
+                pass
             current_shift.clockout = timezone.now()
             current_shift.save()
 
