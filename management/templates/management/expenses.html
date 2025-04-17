@@ -44,7 +44,7 @@
                         <div class="bg-white p-4 rounded-lg shadow">
                             <div class="flex justify-between">
                                 <p class="text-gray-800">Date: {{ expense.expensedate|date:"F j, Y" }}</p>
-                                <p class="text-gray-600">${{ expense.expense }}</p>
+                                <p class="text-gray-600">${{ expense.expense|floatformat:2  }}</p>
                             </div>
                             <form method="post" class="mt-4">
                                 {% csrf_token %}

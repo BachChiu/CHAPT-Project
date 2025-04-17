@@ -56,37 +56,45 @@
                     <input type="datetime-local" name="end_time" id="end_time" class="mt-1 p-2 border rounded" value="{{ end_time_filter }}">
                 </div>
 
-                <button type="submit" class="p-2 bg-blue-500 text-white rounded-lg">Apply Filters</button>
+                <button type="submit" class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Apply Filters</button>
             </form>
 
             <!-- Clock Log Table -->
             {% if clock_logs %}
-                <table class="min-w-full table-auto bg-white shadow-md rounded-lg">
-                    <thead>
-                        <tr>
-                            <th class="px-4 py-2 border">Employee</th>
-                            <th class="px-4 py-2 border">Clock-in</th>
-                            <th class="px-4 py-2 border">Clock-out</th>
-                            <th class="px-4 py-2 border">Compensation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for log in clock_logs %}
+                <div class="overflow-x-auto mt-8">
+                    <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead class="bg-gray-200 text-gray-700 text-left">
                             <tr>
-                                <td class="px-4 py-2 border">{{ log.shift.employeeid.firstname }} {{ log.shift.employeeid.lastname }}</td>
-                                <td class="px-4 py-2 border">{{ log.shift.clockin }}</td>
-                                <td class="px-4 py-2 border">{{ log.shift.clockout }}</td>
-                                <td class="px-4 py-2 border">
-                                    {% if log.compensation %}
-                                        ${{ log.compensation.shiftcompensation|floatformat:2 }}
-                                    {% else %}
-                                        No Compensation
-                                    {% endif %}
-                                </td>
+                                <th class="px-6 py-3">Employee</th>
+                                <th class="px-6 py-3">Clock-in</th>
+                                <th class="px-6 py-3">Clock-out</th>
+                                <th class="px-6 py-3">Compensation</th>
                             </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for log in clock_logs %}
+                                <tr class="border-b">
+                                    <td class="px-6 py-4">
+                                        {{ log.shift.employeeid.firstname }} {{ log.shift.employeeid.lastname }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ log.shift.clockin|date:"g:i A" }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ log.shift.clockout|date:"g:i A" }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {% if log.compensation %}
+                                            ${{ log.compensation.shiftcompensation|floatformat:2 }}
+                                        {% else %}
+                                            No Compensation
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <p>No clock logs found with the applied filters.</p>
             {% endif %}
