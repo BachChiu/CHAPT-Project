@@ -13,7 +13,7 @@
         <nav class="flex flex-col space-y-2">
             <a href="{% url 'dashboardView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Dashboard</a>
             <a href="{% url 'managementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Employee Management</a>
-            <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock Logs</a>
+            <a href="{% url 'manageClockLogsView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock Logs</a>
             <a href="{% url 'expenseView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Payroll & Invoices</a>
             <a href="{% url 'manageScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedules</a>
             <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Requests & Approvals</a>
@@ -71,18 +71,6 @@
                 {% endfor %}
                 </tbody>
             </table>
-        </div>
-
-        <!-- Requests & Approvals Section -->
-        <div class="mt-6 bg-white shadow-md rounded-lg p-4">
-            <h2 class="text-xl font-semibold text-gray-800">Requests & Approvals</h2>
-            <p class="text-gray-500">Coming soon...</p>
-        </div>
-
-        <!-- Payroll & Invoices -->
-        <div class="mt-6 bg-white shadow-md rounded-lg p-4">
-            <h2 class="text-xl font-semibold text-gray-800">Payroll & Invoices</h2>
-            <a href="#" class="text-blue-500 hover:underline">View Payroll Records</a>
         </div>
     </main>
 </div>

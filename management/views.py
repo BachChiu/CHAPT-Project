@@ -2,7 +2,7 @@ import datetime
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
-from common.models import Account, Employed, Company, Expenses, Schedules, Shifttime, Announcements,Notices
+from common.models import Account, Compensation, Employed, Company, Expenses, Schedules, Shifttime, Announcements,Notices
 from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
@@ -187,6 +187,68 @@ class ManageScheduleView(TemplateView):
     
 class ManageClockLogsView(TemplateView):
     template_name = 'management/clockLogs.html'
+
+    def get(self, request):
+        # Check if the user is logged in and is an Employer
+        if 'currentUser' not in request.session or request.session.get('role') != 'Employer':
+            return render(request, 'login/login.html', {"error": "Unauthorized access"})
+
+        # Get the current user (Employer)
+        current_user = Account.objects.get(userid=request.session['currentUser'])
+
+        # Get the company associated with the current employer
+        company = Company.objects.get(employerid=current_user)
+
+        # Fetch employees related to the company
+        employees = Employed.objects.filter(companyid=company).select_related('employeeid')
+
+        # Get filter values from the GET request
+        employee_filter = request.GET.get('employee', '')
+        start_time_filter = request.GET.get('start_time', '')
+        end_time_filter = request.GET.get('end_time', '')
+
+        # Retrieve Shifttime entries for all employees in the company
+        shifttimes = Shifttime.objects.filter(employeeid__in=[e.employeeid for e in employees])
+
+        # Apply employee filter if provided
+        if employee_filter:
+            shifttimes = shifttimes.filter(employeeid=employee_filter)
+
+        # Apply start time filter if provided
+        if start_time_filter:
+            try:
+                start_time = make_aware(parse_datetime(start_time_filter))
+                shifttimes = shifttimes.filter(clockin__gte=start_time)
+            except ValueError:
+                pass  # Ignore invalid date formats
+
+        # Apply end time filter if provided
+        if end_time_filter:
+            try:
+                end_time = make_aware(parse_datetime(end_time_filter))
+                shifttimes = shifttimes.filter(clockout__lte=end_time)
+            except ValueError:
+                pass  # Ignore invalid date formats
+
+        # Fetch the corresponding compensation records
+        compensations = Compensation.objects.filter(shiftid__in=[shift.shiftid for shift in shifttimes])
+
+        # Map compensations to their respective Shifttime records
+        clock_logs = []
+        for shift in shifttimes:
+            compensation = compensations.filter(shiftid=shift).first()  # Get the first compensation (or None if not found)
+            clock_logs.append({
+                'shift': shift,
+                'compensation': compensation
+            })
+
+        return render(request, self.template_name, {
+            'employees': employees,
+            'clock_logs': clock_logs,
+            'employee_filter': employee_filter,
+            'start_time_filter': start_time_filter,
+            'end_time_filter': end_time_filter,
+        })
 
 class ManageAnnouncementView(TemplateView):
     template_name = 'management/manageAnnouncements.html'
