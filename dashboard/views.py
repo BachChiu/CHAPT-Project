@@ -3,9 +3,9 @@ from pyexpat.errors import messages
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.generic import TemplateView
-from common.models import Employed, Account, Shifttime, Break
+from common.models import Compensation, Employed, Account, Expenses, Shifttime, Break
 from django.contrib import messages
-from datetime import timedelta
+from decimal import Decimal
 class dashboardView(TemplateView):
     def get(self, request, *args, **kwargs):
         # Check if the user is logged in
@@ -100,16 +100,17 @@ def clock_action(request):
         if not current_shift:
             messages.error(request, "You're not clocked in.")
         else:
+            now = timezone.now()
             try:
                 active_break = Break.objects.filter(shiftid=current_shift, breakend__isnull=True).first()
                 if active_break:
-                    active_break.breakend = timezone.now()
+                    active_break.breakend = now
                     active_break.save()
             except:
                 pass
             current_shift.clockout = timezone.now()
             current_shift.save()
-
+            total_shift_seconds = (current_shift.clockout - current_shift.clockin).total_seconds()
             # Calculate break duration (if any breaks recorded)
             total_break_seconds = 0
             breaks = Break.objects.filter(shiftid=current_shift, breakstart__isnull=False, breakend__isnull=False)
@@ -123,7 +124,37 @@ def clock_action(request):
             # Store the break duration as a TIME string (e.g., 'HH:MM:SS')
             current_shift.breakduration = f'{int(hours):02}:{int(minutes):02}:{int(seconds):02}'
             current_shift.save()
-
+            actualWorkHours = Decimal(total_shift_seconds - total_break_seconds)/Decimal(3600)
+        
+            current_year, current_week, _ = current_shift.clockin.isocalendar()
+            currentWeekShifts = Shifttime.objects.filter(employeeid=current_user, clockin__isnull=False,clockout__isnull=False, clockin__week = current_week, clockin__year = current_year).exclude(shiftid=current_shift.shiftid)
+            total_week_seconds = 0
+            for shift in currentWeekShifts:
+                shiftSeconds = (shift.clockout - shift.clockin).total_seconds()
+                h,m,s = shift.breakduration.hour, shift.breakduration.minute, shift.breakduration.second
+                shiftBreakTime = h * 3600 + m * 60 + s
+                total_week_seconds += shiftSeconds - shiftBreakTime
+            currentWeekHours = Decimal(total_week_seconds) / Decimal(3600)
+            regularHours = Decimal(min(40 - currentWeekHours, actualWorkHours))
+            overtimeHours = Decimal(max(0, actualWorkHours - regularHours))
+            employee = Employed.objects.get(employeeid = current_user)
+            userSalary = employee.usersalary
+            shiftCompensation = Decimal(regularHours) * userSalary + Decimal(overtimeHours) * userSalary * Decimal(1.5)
+            compensationEntry = Compensation.objects.create(shiftid=current_shift, employeeid = current_user, shiftcompensation = shiftCompensation)
+            try:
+                workDate = current_shift.clockin.date()
+                company = employee.companyid
+                employer = company.employerid
+                expenseEntry = Expenses.objects.filter(employerid =employer, expensedate = workDate).first()
+                if expenseEntry:
+                    expenseEntry.expense += shiftCompensation
+                    expenseEntry.save()
+                else:
+                    Expenses.objects.create(employerid=employer, expensedate = workDate, expense = shiftCompensation)
+            except:
+                #So since the shift is invalid for whatever reason, don't want it to clog the compensation table
+                #Just delete and then recalculate later
+                compensationEntry.delete()
             messages.success(request, "Clocked out successfully.")
 
     return redirect('dashboardView')
