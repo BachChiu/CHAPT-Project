@@ -2,7 +2,7 @@ import datetime
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
-from common.models import Account, Employed, Company, Schedules, Shifttime
+from common.models import Account, Employed, Company, Expenses, Schedules, Shifttime, Announcements,Notices
 from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
@@ -184,3 +184,121 @@ class ManageScheduleView(TemplateView):
                     continue
 
         return redirect('manageScheduleView')
+    
+class ManageClockLogsView(TemplateView):
+    template_name = 'management/clockLogs.html'
+
+class ManageAnnouncementView(TemplateView):
+    template_name = 'management/manageAnnouncements.html'
+
+    def get(self, request):
+        if 'currentUser' not in request.session or request.session.get('role') != 'Employer':
+            return render(request, 'login/login.html', {"error": "Unauthorized access"})
+
+        current_user = Account.objects.get(userid=request.session['currentUser'])
+        announcements = Announcements.objects.filter(employerid=current_user).order_by('-announcementtime')
+
+        return render(request, self.template_name, {
+            'announcements': announcements
+        })
+
+    def post(self, request):
+        if 'currentUser' not in request.session or request.session.get('role') != 'Employer':
+            return render(request, 'login/login.html', {"error": "Unauthorized access"})
+
+        current_user = Account.objects.get(userid=request.session['currentUser'])
+        company = Company.objects.get(employerid=current_user)
+        employees = Employed.objects.filter(companyid=company)
+
+        # Delete announcement
+        if 'delete_announcement' in request.POST:
+            announcement_id = request.POST.get('delete_announcement')
+            try:
+                announcement = Announcements.objects.get(announcementid=announcement_id, employerid=current_user)
+                Notices.objects.filter(announcementid=announcement).delete()
+                announcement.delete()
+            except Announcements.DoesNotExist:
+                pass
+            return redirect('manageAnnouncementView')
+
+        # Post announcement
+        announcement_text = request.POST.get('announcement')
+        if announcement_text:
+            try:
+                announcement = Announcements.objects.create(
+                    employerid=current_user,
+                    announcement=announcement_text,
+                    announcementtime=timezone.now()
+                )
+
+                Notices.objects.bulk_create([
+                    Notices(employeeid=emp.employeeid, announcementid=announcement)
+                    for emp in employees
+                ])
+            except Exception as e:
+                announcements = Announcements.objects.filter(employerid=current_user).order_by('-announcementtime')
+                return render(request, self.template_name, {
+                    'announcements': announcements,
+                    'error': f"Failed to post announcement: {str(e)}"
+                })
+
+        return redirect('manageAnnouncementView')
+    
+class ExpenseView(TemplateView):
+    template_name = 'management/expenses.html'
+
+    def get(self, request):
+        if 'currentUser' not in request.session or request.session.get('role') != 'Employer':
+            return render(request, 'login/login.html', {"error": "Unauthorized access"})
+
+        current_user = Account.objects.get(userid=request.session['currentUser'])
+        company = Company.objects.get(employerid=current_user)
+        employees = Employed.objects.filter(companyid=company)
+
+        # Get filter values
+        start_date_filter = request.GET.get('start_date', '')
+        end_date_filter = request.GET.get('end_date', '')
+
+        if 'reset_filter' in request.GET:
+            try:
+                del request.session['expenseFilter_start']
+            except:
+                pass
+            try:
+                del request.session['expenseFilter_end']
+            except:
+                pass
+            start_date_filter = ''
+            end_date_filter = ''
+
+        # Filter expenses based on the filters provided
+        expenses = Expenses.objects.filter(employerid=current_user)
+        if start_date_filter != '' and start_date_filter:
+            expenses = expenses.filter(expensedate__gte=make_aware(parse_datetime(start_date_filter)))
+        if end_date_filter != '' and end_date_filter:
+            expenses = expenses.filter(expensedate__lte=make_aware(parse_datetime(end_date_filter)))
+
+        expenses = expenses.order_by('-expensedate')
+
+        return render(request, self.template_name, {
+            'employees': employees,
+            'expenses': expenses,
+            'start_date_filter': start_date_filter,
+            'end_date_filter': end_date_filter,
+        })
+
+    def post(self, request):
+        if 'currentUser' not in request.session or request.session.get('role') != 'Employer':
+            return render(request, 'login/login.html', {"error": "Unauthorized access"})
+
+        current_user = Account.objects.get(userid=request.session['currentUser'])
+        # Handle deleting an expense
+        if 'delete_expense' in request.POST:
+            expense_id = request.POST.get('delete_expense')
+            try:
+                expense = Expenses.objects.get(id=expense_id)
+                expense.delete()
+            except Expenses.DoesNotExist:
+                pass
+
+        return redirect('expenseView')

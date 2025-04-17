@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="{% url 'dashboardView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Dashboard</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock In/Out</a>
+                <a href="{% url 'personalTimesheetView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Timesheet</a>
+                <a href="{% url 'personalScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedule</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Payments</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Settings</a>
+                <a href="#" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Profile</a>
+                <a href="{% url 'noticeView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Announcements</a>
+                <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            <h1 class="text-2xl font-semibold mb-6">Company Announcements</h1>
+
+            {% if notices %}
+                <div class="space-y-4">
+                    {% for notice in notices %}
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <p class="text-gray-800">{{ notice.announcementid.announcement }}</p>
+                            <div class="text-sm text-gray-500 mt-2">
+                                Posted by {{ notice.announcementid.employerid.firstname }} {{ notice.announcementid.employerid.lastname }}
+                                on {{ notice.announcementid.announcementtime|date:"F j, Y, g:i a" }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600">There are no announcements to show at this time.</p>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

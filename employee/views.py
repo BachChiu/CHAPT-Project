@@ -3,7 +3,7 @@ import json
 from pyexpat.errors import messages
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
-from common.models import Account, Employed, Company, Schedules, Shifttime
+from common.models import Account, Employed, Company, Notices, Schedules, Shifttime
 from django.utils import timezone
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
@@ -78,4 +78,20 @@ class PersonalTimesheetView(TemplateView):
             'start_date_filter': start_date_filter,
             'end_date_filter': end_date_filter,
             'shifts': shifts
+        })
+        
+class NoticeView(TemplateView):
+    template_name = 'employee/notices.html'
+
+    def get(self, request):
+        if 'currentUser' not in request.session or request.session.get('role') != 'Employee':
+            return render(request, 'login/login.html', {"error": "Unauthorized access"})
+
+        current_user = Account.objects.get(userid=request.session['currentUser'])
+
+        # Fetch notices for the logged-in employee
+        notices = Notices.objects.filter(employeeid=current_user).select_related('announcementid', 'announcementid__employerid').order_by('-announcementid__announcementtime')
+
+        return render(request, self.template_name, {
+            'notices': notices
         })
