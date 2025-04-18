@@ -6,6 +6,8 @@ from django.views.generic import TemplateView
 from common.models import Compensation, Employed, Account, Expenses, Shifttime, Break
 from django.contrib import messages
 from decimal import Decimal
+from django.contrib.auth.hashers import check_password,make_password
+
 class dashboardView(TemplateView):
     def get(self, request, *args, **kwargs):
         # Check if the user is logged in
@@ -158,3 +160,67 @@ def clock_action(request):
             messages.success(request, "Clocked out successfully.")
 
     return redirect('dashboardView')
+
+class profileView(TemplateView):
+    template_name = 'dashboard/profile.html'
+    def get(self, request):
+        # Check if the user is logged in
+        if 'currentUser' not in request.session:
+            return render(request, 'login/login.html', {"error": "Please login to access dashboard"})
+        userRole = request.session.get('role')
+        current_user_id = request.session.get('currentUser')  # Assuming this stores the logged-in employer's ID
+        try:
+            current_user = Account.objects.get(userid=current_user_id)
+            first_name = current_user.firstname
+            last_name = current_user.lastname
+        except Account.DoesNotExist:
+            return render(request, 'login/login.html', {"error": "User not found!"})
+        return render(request, 'dashboard/profile.html',
+        {
+                'current_user':current_user,
+                'role': userRole,
+                'firstName': first_name,
+                'lastName':last_name,
+        })
+    def post(self, request):
+        current_user_id = request.session.get('currentUser')
+        try:
+            current_user = Account.objects.get(userid=current_user_id)
+        except Account.DoesNotExist:
+            return render(request, 'login/login.html', {"error": "User not found!"})
+        first_name = request.POST.get('firstName', '').strip()
+        last_name = request.POST.get('lastName', '').strip()
+        current_password = request.POST.get('currentPassword')
+        new_password = request.POST.get('newPassword')
+        confirm_password = request.POST.get('confirmPassword')
+
+        errors = []
+
+        # Update name if changed
+        if first_name and first_name != current_user.firstname:
+            current_user.firstname = first_name
+        if last_name and last_name != current_user.lastname:
+            current_user.lastname = last_name
+
+        # Handle password change
+        if current_password or new_password or confirm_password:
+            if not all([current_password, new_password, confirm_password]):
+                errors.append("All password fields must be filled to change password.")
+            elif not check_password(current_password, current_user.userpass):
+                errors.append("Current password is incorrect.")
+            elif len(new_password) < 8:
+                errors.append("New password must be at least 8 characters long.")
+            elif new_password != confirm_password:
+                errors.append("New passwords do not match.")
+            else:
+                current_user.userpass = make_password(new_password)
+
+        if errors:
+            for e in errors:
+                messages.error(request, e)
+        else:
+            current_user.save()
+            messages.success(request, "Profile updated successfully!")
+
+        return redirect('profileView')
+        
