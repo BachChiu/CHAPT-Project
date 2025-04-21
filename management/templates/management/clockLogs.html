@@ -64,6 +64,7 @@
                         <thead class="bg-gray-200 text-gray-700 text-left">
                             <tr>
                                 <th class="px-6 py-3">Employee</th>
+                                <th class="px-6 py-3">Date</th>
                                 <th class="px-6 py-3">Clock-in</th>
                                 <th class="px-6 py-3">Clock-out</th>
                                 <th class="px-6 py-3">Compensation</th>
@@ -74,6 +75,9 @@
                                 <tr class="border-b">
                                     <td class="px-6 py-4">
                                         {{ log.shift.employeeid.firstname }} {{ log.shift.employeeid.lastname }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ log.shift.clockin|date:"M d, Y" }}
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ log.shift.clockin|date:"g:i A" }}
