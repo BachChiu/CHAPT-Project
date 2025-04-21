@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timesheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="{% url 'dashboardView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Dashboard</a>
+                <a href="{% url 'personalTimesheetView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Timesheet</a>
+                <a href="{% url 'personalScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedule</a>
+                <a href="{% url 'profileView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Profile</a>
+                <a href="{% url 'noticeView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Announcements</a>
+                <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">Your personal timesheet</h2>
+
+            <!-- Filter Form -->
+            <form method="GET" class="space-y-4 mb-6 bg-white p-6 rounded-lg shadow-md">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
+                        <input type="datetime-local" name="start_date" value="{{ start_date_filter }}" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">End Date</label>
+                        <input type="datetime-local" name="end_date" value="{{ end_date_filter }}" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                    </div>
+                </div>
+                <button type="submit" class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Apply Filters</button>
+                <button type="submit" name="reset_filter" class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Reset Filters</button>
+            </form>
+
+            <!-- Timesheet Table -->
+            <div class="overflow-x-auto mt-8">
+                <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                    <thead class="bg-gray-200 text-gray-700 text-left">
+                        <tr>
+                            <th class="px-6 py-3">Date</th>
+                            <th class="px-6 py-3">Clock In</th>
+                            <th class="px-6 py-3">Clock Out</th>
+                            <th class="px-6 py-3">Break Duration</th>
+                            <th class="px-6 py-3">Compensation</th> <!-- Added Compensation column -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in shift_data %}
+                        <tr class="border-b">
+                            <td class="px-6 py-4">
+                                {{ item.shift.clockin|date:"l, F j, Y" }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ item.shift.clockin|date:"g:i A" }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {{ item.shift.clockout|date:"g:i A" }}
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if item.shift.breakduration %}
+                                    {{ item.shift.breakduration|time:"H:i:s" }}
+                                {% else %}
+                                    None
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                {% if item.compensation %}
+                                    ${{ item.compensation.shiftcompensation|floatformat:2 }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">No timesheet entries found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

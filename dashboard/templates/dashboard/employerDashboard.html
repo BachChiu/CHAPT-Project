@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employer Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+        <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+        <nav class="flex flex-col space-y-2">
+            <a href="{% url 'dashboardView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Dashboard</a>
+            <a href="{% url 'managementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Employee Management</a>
+            <a href="{% url 'manageClockLogsView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock Logs</a>
+            <a href="{% url 'expenseView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Payroll & Invoices</a>
+            <a href="{% url 'manageScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedules</a>
+            <a href="{% url 'profileView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Profile</a>
+            <a href="{% url 'manageAnnouncementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Announcements</a>
+            <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 overflow-y-auto">
+        <!-- Welcome & Profile Section -->
+        <div class="bg-white shadow-md rounded-lg p-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-800">Welcome, {{ current_user.firstname }} {{ current_user.lastname }}!</h1>
+                <p class="text-gray-600 mt-2">Manage employee data and company schedules.</p>
+            </div>
+            <div class="flex items-center">
+                <img src="https://via.placeholder.com/50" alt="Profile Picture" class="w-12 h-12 rounded-full">
+                <div class="ml-4">
+                    <h2 class="text-lg font-semibold text-gray-800">{{ current_user.firstname }} {{ current_user.lastname }}</h2>
+                    <p class="text-gray-600">Employer</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee Management Section -->
+        <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+            <h2 class="text-xl font-semibold text-gray-800">Employee Management</h2>
+            <table class="w-full mt-4 border-collapse border border-gray-300">
+                <thead>
+                <tr class="bg-gray-200">
+                    <th class="border p-2">Name</th>
+                    <th class="border p-2">Position</th>
+                    <th class="border p-2">Salary</th>
+                    <th class="border p-2">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for emp in employees %}
+                    <tr>
+                        <td class="border p-2">{{ emp.employeeid.firstname }} {{ emp.employeeid.lastname }}</td>
+                        <td class="border p-2">{{ emp.userrole.userrole }}</td>
+                        <!-- Format salary to 2 decimal places -->
+                        <td class="border p-2">${{ emp.usersalary|floatformat:2 }}</td>
+                        <td class="border p-2">
+                            <a href="{% url 'view_emp_scheduleView' emp.employeeid.userid %}" class="bg-blue-500 text-white px-2 py-1 rounded">View Schedule</a>
+                        
+                            <!-- <a href=" url 'clockLogsView' emp.employeeid.userid %}" class="bg-green-500 text-white px-2 py-1 rounded ml-2">Clock Logs</a> -->
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center p-4 text-gray-500">No employees found.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>

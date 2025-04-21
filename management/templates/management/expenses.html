@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Expenses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="{% url 'dashboardView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Dashboard</a>
+                <a href="{% url 'managementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Employee Management</a>
+                <a href="{% url 'manageClockLogsView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock Logs</a>
+                <a href="{% url 'expenseView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Payroll & Invoices</a>
+                <a href="{% url 'manageScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedules</a>
+                <a href="{% url 'profileView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Profile</a>
+                <a href="{% url 'manageAnnouncementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Announcements</a>
+                <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            <h1 class="text-2xl font-semibold mb-6">Manage Expenses</h1>
+
+            <!-- Filter Section -->
+            <form method="get" class="mb-6 flex space-x-4">
+                <input type="date" name="start_date" value="{{ start_date_filter }}" class="p-2 border rounded" />
+                <input type="date" name="end_date" value="{{ end_date_filter }}" class="p-2 border rounded" />
+                <button type="submit" class="p-2 bg-blue-500 text-white rounded">Filter</button>
+                <a href="?reset_filter=true" class="p-2 bg-red-500 text-white rounded">Reset Filters</a>
+            </form>
+
+            <p class="text-sm text-yellow-600 italic mt-4">Note: Please ensure the expense is paid before deleting it from the records.</p>
+
+            {% if expenses %}
+                <div class="space-y-4">
+                    {% for expense in expenses %}
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <div class="flex justify-between">
+                                <p class="text-gray-800">Date: {{ expense.expensedate|date:"F j, Y" }}</p>
+                                <p class="text-gray-600">${{ expense.expense|floatformat:2  }}</p>
+                            </div>
+                            <form method="post" class="mt-4">
+                                {% csrf_token %}
+                                <button type="submit" name="delete_expense" value="{{ expense.id }}" class="p-2 bg-red-500 text-white rounded-lg">Delete</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-600">No expenses recorded for the selected filters.</p>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

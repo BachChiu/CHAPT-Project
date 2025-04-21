@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Clock Logs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="{% url 'dashboardView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Dashboard</a>
+                <a href="{% url 'managementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Employee Management</a>
+                <a href="{% url 'manageClockLogsView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Clock Logs</a>
+                <a href="{% url 'expenseView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Payroll & Invoices</a>
+                <a href="{% url 'manageScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedules</a>
+                <a href="{% url 'profileView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Profile</a>
+                <a href="{% url 'manageAnnouncementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Announcements</a>
+                <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <h2 class="text-2xl font-semibold mb-4">Manage Clock Logs</h2>
+
+            <!-- Filter Form -->
+            <form method="get" action="{% url 'manageClockLogsView' %}" class="mb-6">
+                <!-- Employee Filter -->
+                <div class="mb-4">
+                    <label for="employee" class="block text-gray-700">Filter by Employee</label>
+                    <select name="employee" id="employee" class="mt-1 p-2 border rounded">
+                        <option value="">All Employees</option>
+                        {% for employee in employees %}
+                            <option value="{{ employee.employeeid.userid }}" {% if employee.employeeid.userid == employee_filter %}selected{% endif %}>
+                                {{ employee.employeeid.firstname }} {{ employee.employeeid.lastname }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Start Time Filter -->
+                <div class="mb-4">
+                    <label for="start_time" class="block text-gray-700">Filter by Start Time</label>
+                    <input type="datetime-local" name="start_time" id="start_time" class="mt-1 p-2 border rounded" value="{{ start_time_filter }}">
+                </div>
+
+                <!-- End Time Filter -->
+                <div class="mb-4">
+                    <label for="end_time" class="block text-gray-700">Filter by End Time</label>
+                    <input type="datetime-local" name="end_time" id="end_time" class="mt-1 p-2 border rounded" value="{{ end_time_filter }}">
+                </div>
+
+                <button type="submit" class="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Apply Filters</button>
+            </form>
+
+            <!-- Clock Log Table -->
+            {% if clock_logs %}
+                <div class="overflow-x-auto mt-8">
+                    <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+                        <thead class="bg-gray-200 text-gray-700 text-left">
+                            <tr>
+                                <th class="px-6 py-3">Employee</th>
+                                <th class="px-6 py-3">Date</th>
+                                <th class="px-6 py-3">Clock-in</th>
+                                <th class="px-6 py-3">Clock-out</th>
+                                <th class="px-6 py-3">Compensation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in clock_logs %}
+                                <tr class="border-b">
+                                    <td class="px-6 py-4">
+                                        {{ log.shift.employeeid.firstname }} {{ log.shift.employeeid.lastname }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ log.shift.clockin|date:"M d, Y" }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ log.shift.clockin|date:"g:i A" }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ log.shift.clockout|date:"g:i A" }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {% if log.compensation %}
+                                            ${{ log.compensation.shiftcompensation|floatformat:2 }}
+                                        {% else %}
+                                            No Compensation
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p>No clock logs found with the applied filters.</p>
+            {% endif %}
+        </main>
+    </div>
+</body>
+</html>

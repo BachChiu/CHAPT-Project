@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="{% url 'dashboardView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Dashboard</a>
+                <a href="{% url 'personalTimesheetView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Timesheet</a>
+                <a href="{% url 'personalScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedule</a>
+                <a href="{% url 'profileView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Profile</a>
+                <a href="{% url 'noticeView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Announcements</a>
+                <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6">
+            <!-- Welcome Section -->
+            <div class="bg-white shadow-md rounded-lg p-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-semibold text-gray-800">Welcome, {{ current_user.firstname }} {{ current_user.lastname }}!</h1>
+                    <p class="text-gray-600 mt-2">Here's your current schedule and shift controls.</p>
+                </div>
+                <div class="flex items-center">
+                    <img src="https://via.placeholder.com/50" alt="Profile Picture" class="w-12 h-12 rounded-full">
+                    <div class="ml-4">
+                        <h2 class="text-lg font-semibold text-gray-800">{{ current_user.firstname }} {{ current_user.lastname }}</h2>
+                        <p class="text-gray-600">Employee</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Section -->
+            {% if messages %}
+            <div class="mt-4 space-y-2">
+                {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}bg-red-100 text-red-800{% elif message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %} p-3 rounded-md shadow-sm">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Clock In/Out Section -->
+            <div class="mt-6 bg-white shadow-md rounded-lg p-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800">Current Time</h2>
+                    </div>
+                    <div class="text-right">
+                        <p id="clock" class="text-lg text-blue-600 font-semibold"></p>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="mt-2">
+                    <p class="text-lg font-medium">
+                        Status: 
+                        <span class="font-bold {% if clock_status == 'Clocked In' %}text-green-600{% else %}text-gray-600{% endif %}">
+                            {{ clock_status }}
+                        </span>
+                    </p>
+                    {% if clock_status == "Clocked In" %}
+                        <p class="text-sm {% if on_break %}text-yellow-600{% else %}text-gray-500{% endif %}">
+                            {% if on_break %}Currently on break{% else %}No active break{% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Clock Buttons -->
+                <form method="POST" action="{% url 'clockAction' %}" class="flex space-x-2 mt-6">
+                    {% csrf_token %}
+                    <button name="action" value="clock_in" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">Clock In</button>
+                    <button name="action" value="take_break" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600">Start/End Break</button>
+                    <button name="action" value="clock_out" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">Clock Out</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function updateClock() {
+            const clockElement = document.getElementById("clock");
+            if (clockElement) {
+                setInterval(() => {
+                    const now = new Date();
+                    clockElement.textContent = now.toLocaleTimeString();
+                }, 1000);
+            }
+        }
+        updateClock();
+    </script>
+</body>
+</html>

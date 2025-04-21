@@ -3,7 +3,7 @@ class Account(models.Model):
     userid = models.CharField(db_column='userID', primary_key=True, max_length=100)  # Field name made lowercase.
     firstname = models.CharField(db_column='firstName', max_length=100)  # Field name made lowercase.
     lastname = models.CharField(db_column='lastName', max_length=100)  # Field name made lowercase.
-    userpass = models.CharField(db_column='userPass', max_length=64, blank=True, null=True)  # Field name made lowercase.
+    userpass = models.CharField(db_column='userPass', max_length=256, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False

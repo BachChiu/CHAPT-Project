@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        {% if role == "Employee" %}
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="{% url 'dashboardView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Dashboard</a>
+                <a href="{% url 'personalTimesheetView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Timesheet</a>
+                <a href="{% url 'personalScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedule</a>
+                <a href="{% url 'profileView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Profile</a>
+                <a href="{% url 'noticeView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Announcements</a>
+                <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+        {% elif role == "Employer"%}
+        <aside class="w-64 bg-white shadow-lg p-4 flex flex-col space-y-4">
+            <h2 class="text-xl font-semibold text-gray-700">TimeTracker</h2>
+            <nav class="flex flex-col space-y-2">
+                <a href="{% url 'dashboardView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Dashboard</a>
+                <a href="{% url 'managementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Employee Management</a>
+                <a href="{% url 'manageClockLogsView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Clock Logs</a>
+                <a href="{% url 'expenseView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Payroll & Invoices</a>
+                <a href="{% url 'manageScheduleView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Schedules</a>
+                <a href="{% url 'profileView' %}" class="p-2 bg-blue-500 text-white rounded-lg">Profile</a>
+                <a href="{% url 'manageAnnouncementView' %}" class="p-2 text-gray-700 hover:bg-gray-200 rounded-lg">Announcements</a>
+                <a href="{% url 'logoutView' %}" class="p-2 text-red-600 hover:bg-gray-200 rounded-lg">Logout</a>
+            </nav>
+        </aside>
+        {% endif %}
+        <main class="flex-1 p-6 overflow-auto">
+            <div class="max-w-xl mx-auto bg-white shadow-md rounded-lg p-6">
+                <h2 class="text-2xl font-bold mb-4">Profile</h2>
+
+                {% if messages %}
+                    <ul class="mb-4">
+                        {% for message in messages %}
+                            <li class="text-{{ message.tags }}-600">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">First Name</label>
+                        <input type="text" name="firstName" value="{{ firstName }}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Last Name</label>
+                        <input type="text" name="lastName" value="{{ lastName }}" class="mt-1 block w-full border border-gray-300 rounded-lg p-2" required>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h3 class="text-lg font-semibold">Change Password</h3>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Current Password</label>
+                        <input type="password" name="currentPassword" class="mt-1 block w-full border border-gray-300 rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">New Password</label>
+                        <input type="password" name="newPassword" class="mt-1 block w-full border border-gray-300 rounded-lg p-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                        <input type="password" name="confirmPassword" class="mt-1 block w-full border border-gray-300 rounded-lg p-2">
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
